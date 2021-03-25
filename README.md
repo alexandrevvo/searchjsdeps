@@ -17,7 +17,7 @@ Enumerating subdomains
 * cat amass_subf.txt | httprobe --prefer-https | tee probed.txt
 * echo d1.com | waybackurls | tee wayback.txt
   *  _In case of having multiple domais to search in waybackurls;_   
-  * for domain in $(cat domains.txt); do waybackurls $domain | tee "wayback-"$domain".txt";done; cat wayback-* > wayback.txt
+  * for dom in $(cat domains.txt); do waybackurls $dom >> wayback.txt;done
 
 Generating the file with all hosts in the format "http://sub.domain.com/path"
 * cat probed.txt wayback.txt > allhosts.txt 
