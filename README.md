@@ -2,10 +2,11 @@
 Search javascript files looking for potential dependency confusion
 
 # USAGE
-* '-s','--search', File containing a list of js urls to search npm dependencies
-* '-u','--url', Single url of the javascript file
-* '-d','--download', Download the content of the javascripts urls in a file
-* '-p','--path', Directory path to save the js contents
+* -s,--search, File containing a list of js urls to search npm dependencies
+* -t,--threads, Number of threads; Default = 8
+* -u,--url, Single url of the javascript file
+* -d,--download, Download the content of the javascripts urls in a file
+* -p,--path, Directory path to save the js contents
 
 Generating the file with js urls:
 
