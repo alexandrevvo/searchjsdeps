@@ -8,12 +8,18 @@ import argparse as ap
 from urllib.parse import urlparse
 import hashlib
 import os
-
+import time
+from threading import Thread
+import queue
 
 requests.packages.urllib3.disable_warnings() 
 
 def search_url(single_url):
-	r = requests.get(single_url, verify=False)
+	try:
+		r = requests.get(single_url, verify=False)
+	except:
+		print("Failed to connect.")
+		return False
 
 	dependencies_regex = re.compile("\"dependencies\":{")
 	check_deps = dependencies_regex.findall(r.text)
@@ -67,22 +73,18 @@ def download(jsfile, content_path):
 
 
 
-def search(jsfile):
-	pwnd = []
-	with open(jsfile,"r") as f:
-		urls = f.readlines()
-		for url in urls:
-				
-			headers = {"accept": "text/html,application/xhtml+xml,application/xml,application/json","User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36","accept-encoding": "gzip, deflate, br", "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"}
-			r = requests.get(url.rstrip("\n"), headers= headers, verify=False)
-			#print(r.text)
-			print(colored(f"Pesquisando arquivo {url}", "blue"), end='') 
+def search():
+	while not fila.empty():
 
-			print(colored(f"{r.status_code}\n", "blue"))
+		try:
+			url = fila.get()
+			r = requests.get(url.rstrip("\n"), verify=False)
+		
+			print(colored(f"Searching {url} - {r.status_code}", "blue")) 
 
 			dependencies_regex = re.compile("\"dependencies\":{")
 			check_deps = dependencies_regex.findall(r.text)
-
+			
 			if check_deps != []:
 				pkgs_regex = re.compile("\"[-_.@/\w]{1,50}\":\"[\^~]?[\d]{1,2}\.[\d]{1,2}\.[\d]{1,2}\"")
 				pkgs = pkgs_regex.findall(r.text)
@@ -93,29 +95,64 @@ def search(jsfile):
 					#print(package)
 					url_npm = f"https://registry.npmjs.org/{package}"
 					headers = {"Connection": "close", "accept": "application/json","User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36", "Accept-Encoding": "gzip, deflate", "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"}
-					r2 = requests.get(url_npm, headers=headers)
+					
+					try:
 
-					if r2.status_code != 200:
-						print(colored(f"Pacote: {package} não encontrado! Versão solicitada: {version}", "red"))
-						pwnd.append(f"{package}, {version}")
-					else:
-						print(colored(f"Pacote {package} encontrado!", "green"))
-			#else:
-				#print("no dependencies\n")
-	print(pwnd)
+						r2 = requests.get(url_npm, headers=headers)
+
+						if r2.status_code != 200:
+							print(colored(f"Package: {package} not found! Version: {version}", "red"))
+							pwnd.append(f"{url} - {package}:{version}")
+						#else:
+						#	print(colored(f"Pacote {package} encontrado!", "green"))
+					except:
+						continue
+		except:
+			pass
+		fila.task_done()
+
+		#else:
+			#print("no dependencies\n")
 
 #usage example: cat enum-spotify.net | httprobe --prefer-https | subjs | grep -v "cloudflare\|jquery\|bootstrapcdn\|google" | sort -u > javascripts.txt; python3 find-deps.py
 
 if __name__=='__main__':
+	pwnd=[]
+	t0 = time.time()
+	fila = queue.Queue()
+	num_threads = 8
+
 	parser = ap.ArgumentParser()
 	parser.add_argument('-s','--search', help="File containing a list of js urls to search npm dependencies", required=False)
+	parser.add_argument('-t','--threads', help="Number of threads; Default = 8", required=False)
 	parser.add_argument('-u','--url',help="Single url of the javascript file",required=False)
 	parser.add_argument('-d','--download',help="Download the content of the javascripts urls in a file",required=False)
 	parser.add_argument('-p','--path',help="Directory path to save the js contents",required=False)
 	args = parser.parse_args()
 
+	if args.threads:
+		num_threads = int(args.threads)
+
 	if args.search:
-		search(args.search)
+		threadList = []
+		with open(args.search,"r") as f:
+			for url in f:
+				url = url.rstrip("\n")
+				fila.put(url)
+			try:
+				for k in range(num_threads):
+					threadList.append(Thread(target=search))
+
+				[t.start() for t in threadList]
+				fila.join()
+			except KeyboardInterrupt:
+				exit(0)
+
+		print(colored("\nPackages not found in the public NPM registry:\n","green"))
+		for pkg in pwnd:
+			print(colored(pkg,"red"))
+		print(f"\nTime running: {time.time() - t0}")	
+
 	if args.url:
 		search_url(args.url)
 	if args.download:
