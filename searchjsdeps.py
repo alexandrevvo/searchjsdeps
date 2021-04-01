@@ -78,12 +78,15 @@ def search():
 
 		try:
 			url = fila.get()
-			r = requests.get(url.rstrip("\n"), verify=False)
+			headers = {"Connection": "close", "accept": "application/json","User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36", "Accept-Encoding": "gzip, deflate", "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"}
+
+			r = requests.get(url.rstrip("\n"), headers=headers, verify=False)
 		
 			print(colored(f"Searching {url} - {r.status_code}", "blue")) 
 
 			dependencies_regex = re.compile("\"dependencies\":{")
 			check_deps = dependencies_regex.findall(r.text)
+
 			
 			if check_deps != []:
 				pkgs_regex = re.compile("\"[-_.@/\w]{1,50}\":\"[\^~]?[\d]{1,2}\.[\d]{1,2}\.[\d]{1,2}\"")
@@ -103,18 +106,17 @@ def search():
 						if r2.status_code != 200:
 							print(colored(f"Package: {package} not found! Version: {version}", "red"))
 							pwnd.append(f"{url} - {package}:{version}")
-						#else:
-						#	print(colored(f"Pacote {package} encontrado!", "green"))
+						else:
+							print(colored(f"Pacote {package} encontrado!", "green"))
 					except:
 						continue
+			#else:
+				#print("no deps")
 		except:
 			pass
+
 		fila.task_done()
-
-		#else:
-			#print("no dependencies\n")
-
-#usage example: cat enum-spotify.net | httprobe --prefer-https | subjs | grep -v "cloudflare\|jquery\|bootstrapcdn\|google" | sort -u > javascripts.txt; python3 find-deps.py
+		
 
 if __name__=='__main__':
 	pwnd=[]
