@@ -15,9 +15,10 @@ Enumerating subdomains
 * subfinder [-d d1.com] [-dL file.txt] -o subfinder.txt
 * cat amass.txt subfinder.txt | sort -u | tee amass_subf.txt
 * cat amass_subf.txt | httprobe --prefer-https | tee probed.txt
-* echo d1.com | waybackurls | tee wayback.txt
+* echo d1.com | waybackurls | cut -d/ -f1-4 | sort -u | tee wayback.txt
   *  _In case of having multiple domais to search in waybackurls;_   
-  * for domain in $(cat domains.txt); do waybackurls $domain | tee "wayback-"$domain".txt";done; cat wayback-* > wayback.txt
+  * for dom in $(cat domains.txt); do waybackurls $dom | cut -d/ -f1-4 | sort -u >> wayback.txt;done
+
 
 Generating the file with all hosts in the format "http://sub.domain.com/path"
 * cat probed.txt wayback.txt > allhosts.txt 
