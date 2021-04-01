@@ -26,3 +26,10 @@ Extracting all javascript files from each subdomain URL
 * cat allhosts.txt | subjs | sort -u | grep -v "cloudflare\|jquery\|bootstrapcdn\|google" | tee jsfiles.txt 
 
 **./searchjsdeps.py -f jsfiles.txt**
+
+# TODO
+
+Incluir a busca do nome do próprio package do 'package.json' no npm (e não só suas dependências);
+
+Adequar o script bash para receber inputs do usuário.
+
