@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-
+echo "Analisando entradas do arquivo domains.txt.. verifique se existe esse arquivo no diretório atual!\n";
 
 amass enum -df domains.txt -o amass.txt;
 echo "amass done\n";
@@ -13,4 +13,7 @@ echo "wayback done\n";
 
 cat probed.txt wayback.txt > allhosts.txt;
 
-cat allhosts.txt | subjs | sort -u | grep -v "cloudflare|jquery|bootstrapcdn|google" | tee jsfiles.txt
+cat allhosts.txt | subjs | sort -u | grep -v "cloudflare|jquery|bootstrapcdn|google" | tee jsfiles.txt;
+
+python3 searchjsdeps.py -s jsfiles.txt;
+

