@@ -159,8 +159,9 @@ if __name__=='__main__':
 				os.system(f"curl 'https://api.telegram.org/bot1738066960:AAFQBQK9QrYCbKOAATNceeuDUT_Q45nhrpA/sendMessage?chat_id=429338501&text={pkg}'")
 		else:
 			print(colored("\nNo unpublished packages found.\n","green"))
-			os.system(f"curl 'https://api.telegram.org/bot1738066960:AAFQBQK9QrYCbKOAATNceeuDUT_Q45nhrpA/sendMessage?chat_id=429338501&text=No%20unpublished%20packages%20found'"
-		print(f"\nTime running: {time.time() - t0}")	
+			os.system(f"curl 'https://api.telegram.org/bot1738066960:AAFQBQK9QrYCbKOAATNceeuDUT_Q45nhrpA/sendMessage?chat_id=429338501&text=No%20unpublished%20packages%20found'")
+		duration = time.time() - t0
+		print(f"Time running: {duration}")	
 
 	if args.url:
 		search_url(args.url)
