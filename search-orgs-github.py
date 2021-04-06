@@ -24,7 +24,7 @@ def check_principal_pkg_name(pkgname):
     url_npm = f"https://registry.npmjs.org/{pkgname}"
     headers = {"Connection": "close", "accept": "application/json","User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36", "Accept-Encoding": "gzip, deflate", "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"}
     r = requests.get(url_npm, headers=headers)
-    print("Checking package name.")
+    print(colored("Checking package name.","blue"))
     if r.status_code != 200:
         print(colored(f"Pacote: {pkgname} não encontrado! Versão solicitada: xxx", "red"))
         pwnd.append(f"{pkgname}, xxx")
@@ -38,14 +38,18 @@ def search(org):
     dp = {}
     org_invalida = []
     org_sem_package = []
+    org_lowercase = org.lower()
+    org_capitalized = org.capitalize()
     try:
-        URL = "https://api.github.com/search/code?q="+"filename:package.json"+"+org:"+org
+        URL = "https://api.github.com/search/code?q="+"filename:package.json"+"+org:"+org_lowercase
         fp = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"850649e900553e286baeea4b117b0c0ccc26fbc8"})
         js = json.loads(fp.content)
         if fp.status_code !=200:
-            org_invalida.append(org)
-            #print(f"Não encontramos a org {org} no github")
-            return
+            URL = "https://api.github.com/search/code?q="+"filename:package.json"+"+org:"+ org_capitalized
+            fp = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"850649e900553e286baeea4b117b0c0ccc26fbc8"})
+            js = json.loads(fp.content)
+            if fp.status_code !=200:
+                return
         for url in js['items']:
             if "package.json" in (url['url']):
                 if "package.json.meta" in (url['url']):
@@ -86,7 +90,7 @@ def search(org):
                     except Exception as e:
                         pass
                     if dp:   
-                        print("Checking dependencies.")                     
+                        print(colored("Checking dependencies.","blue"))                   
                         for package in dp.keys():
                             url_npm = f"https://registry.npmjs.org/{package}"
                             headers = {"Connection": "close", "accept": "application/json","User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36", "Accept-Encoding": "gzip, deflate", "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"}
