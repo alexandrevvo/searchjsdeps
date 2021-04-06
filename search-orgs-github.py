@@ -24,7 +24,7 @@ def check_principal_pkg_name(pkgname):
     url_npm = f"https://registry.npmjs.org/{pkgname}"
     headers = {"Connection": "close", "accept": "application/json","User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36", "Accept-Encoding": "gzip, deflate", "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"}
     r = requests.get(url_npm, headers=headers)
-    print("CHECKING PRINCIPAL")
+    print("Checking package name.")
     if r.status_code != 200:
         print(colored(f"Pacote: {pkgname} não encontrado! Versão solicitada: xxx", "red"))
         pwnd.append(f"{pkgname}, xxx")
@@ -36,7 +36,6 @@ def check_principal_pkg_name(pkgname):
 def search(org):
     urls = []
     dp = {}
-    pwnd = []
     org_invalida = []
     org_sem_package = []
     try:
@@ -77,15 +76,17 @@ def search(org):
                         json.dump(js2['dependencies'],output)
                     except Exception as e:
                         pass
-                        ##Adicionando a verificação do nome do pacote principal no npm;
+
+                    print(colored(f"URL: {download_url}",'green'))
+                    ##Adicionando a verificação do nome do pacote principal no npm;
                     check_principal_pkg_name(js2['name'])
 
                     try:
                         json.dump(js2['devDependencies'],output2)
                     except Exception as e:
                         pass
-                    if dp:
-                        print(colored(f"URL: {download_url}",'green'))
+                    if dp:   
+                        print("Checking dependencies.")                     
                         for package in dp.keys():
                             url_npm = f"https://registry.npmjs.org/{package}"
                             headers = {"Connection": "close", "accept": "application/json","User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36", "Accept-Encoding": "gzip, deflate", "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7"}
@@ -106,6 +107,7 @@ def search(org):
         raise e
 
 if __name__=='__main__':
+    pwnd = []
     parser = ap.ArgumentParser()
     parser.add_argument('-o','--org', help="organization that will be search", required=False)
     parser.add_argument('-a','--aut',required=False, type=bool)
