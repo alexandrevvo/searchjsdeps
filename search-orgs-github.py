@@ -35,17 +35,17 @@ def check_principal_pkg_name(pkgname):
 
 def search(org):
     urls = []
-    dp = {}
     org_invalida = []
     org_sem_package = []
     org_lowercase = org.lower()
     org_capitalized = org.capitalize()
     try:
-        URL = "https://api.github.com/search/code?q="+"filename:package.json"+"+org:"+org_lowercase
+        # Falta tratar a pesquisa nas outras páginas qdo o resultado contem mais de 100 registros.. Além disso, o github limita a pesquisa aos primeiros 1000 results.
+        URL = "https://api.github.com/search/code?per_page=100&q="+"filename:package.json"+"+org:"+org_lowercase
         fp = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"850649e900553e286baeea4b117b0c0ccc26fbc8"})
         js = json.loads(fp.content)
         if fp.status_code !=200:
-            URL = "https://api.github.com/search/code?q="+"filename:package.json"+"+org:"+ org_capitalized
+            URL = "https://api.github.com/search/code?per_page=100&q="+"filename:package.json"+"+org:"+ org_capitalized
             fp = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"850649e900553e286baeea4b117b0c0ccc26fbc8"})
             js = json.loads(fp.content)
             if fp.status_code !=200:
@@ -66,6 +66,7 @@ def search(org):
                 for URL in urls:
                 #exemplo de URL = "https://api.github.com/repositories/309216415/contents/package.json?ref=6f0107c3cbc0983b4d0364c87e2168b2d21f63c7"
                     r = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"850649e900553e286baeea4b117b0c0ccc26fbc8"})
+                    dp = {}
                     
                     try:
                         js = json.loads(r.content)
@@ -86,6 +87,9 @@ def search(org):
                     check_principal_pkg_name(js2['name'])
 
                     try:
+                        #Fazer a verificação nas devDependencies tbm ?
+                        #for pacote in js2['devDependencies'].keys():
+                        #    dp[pacote] = js2['devDependencies'][pacote]
                         json.dump(js2['devDependencies'],output2)
                     except Exception as e:
                         pass
