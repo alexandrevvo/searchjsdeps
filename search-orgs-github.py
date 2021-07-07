@@ -61,6 +61,9 @@ def search(org):
             #print(f"A empresa {org} não possui arquivos package.json")
             org_sem_package.append(org)
             return
+
+        print(f"{len(urls)} arquivos encontrados")
+
         with open(org, 'a') as output:
             with open(f"{org}+dev", 'a') as output2:
                 for URL in urls:
@@ -84,7 +87,10 @@ def search(org):
 
                     print(colored(f"URL: {download_url}",'green'))
                     ##Adicionando a verificação do nome do pacote principal no npm;
-                    check_principal_pkg_name(js2['name'])
+                    try:
+                        check_principal_pkg_name(js2['name'])
+                    except Exception as e:
+                        pass
 
                     try:
                         #Fazer a verificação nas devDependencies tbm ?
