@@ -8,9 +8,9 @@ from termcolor import colored
 
 def getorg():
     orgs = []
+    #fetching data from this github repository. 
     URL = "https://raw.githubusercontent.com/arkadiyt/bounty-targets-data/34928597d1c16ac3e12d05b9020e984b514b7e99/data/intigriti_data.json"
-    #URL = "https://api.github.com/repositories/309216415/contents/package.json?ref=6f0107c3cbc0983b4d0364c87e2168b2d21f63c7"
-    r = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"850649e900553e286baeea4b117b0c0ccc26fbc8"})
+    r = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"<token>"})
     arquivo = r.json()
     for x in range(len(arquivo)):
         orgs.append(arquivo[x]['handle'])
@@ -42,11 +42,11 @@ def search(org):
     try:
         # Falta tratar a pesquisa nas outras páginas qdo o resultado contem mais de 100 registros.. Além disso, o github limita a pesquisa aos primeiros 1000 results.
         URL = "https://api.github.com/search/code?per_page=100&q="+"filename:package.json"+"+org:"+org_lowercase
-        fp = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"850649e900553e286baeea4b117b0c0ccc26fbc8"})
+        fp = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"<token>"})
         js = json.loads(fp.content)
         if fp.status_code !=200:
             URL = "https://api.github.com/search/code?per_page=100&q="+"filename:package.json"+"+org:"+ org_capitalized
-            fp = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"850649e900553e286baeea4b117b0c0ccc26fbc8"})
+            fp = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"<token>"})
             js = json.loads(fp.content)
             if fp.status_code !=200:
                 return
@@ -68,7 +68,7 @@ def search(org):
             with open(f"{org}+dev", 'a') as output2:
                 for URL in urls:
                 #exemplo de URL = "https://api.github.com/repositories/309216415/contents/package.json?ref=6f0107c3cbc0983b4d0364c87e2168b2d21f63c7"
-                    r = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"850649e900553e286baeea4b117b0c0ccc26fbc8"})
+                    r = requests.get(URL, headers={"Accept":"application/vnd.github.v3+json", "Authorization": "token "+"<token>"})
                     dp = {}
                     
                     try:
