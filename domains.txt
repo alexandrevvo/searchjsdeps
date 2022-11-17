@@ -1,2 +1,1 @@
 yahoo.com
-irl="https://hooks.slack.com/services/T01EGAS4V41/asdkfjh3298/asdjfha782hfo78hfg74"
